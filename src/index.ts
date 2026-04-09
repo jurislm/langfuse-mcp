@@ -14,16 +14,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { Langfuse } from "langfuse";
 import { z } from "zod";
-
-// --- Langfuse Client ---
-
-const langfuse = new Langfuse({
-  publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-  secretKey: process.env.LANGFUSE_SECRET_KEY,
-  baseUrl: process.env.LANGFUSE_HOST,
-});
 
 /** Basic auth header for REST API calls */
 function getAuthHeader(): string {
