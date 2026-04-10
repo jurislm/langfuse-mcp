@@ -25,6 +25,10 @@ import { registerDatasetTools } from "./tools/datasets.js";
 import { registerMetricsTools } from "./tools/metrics.js";
 import { registerScoreConfigTools } from "./tools/score-configs.js";
 import { registerProjectTools } from "./tools/projects.js";
+import { registerInstanceTools } from "./tools/instance-management.js";
+import { registerOrganizationProjectsTools } from "./tools/organization-projects.js";
+import { registerOrganizationApiKeysTools } from "./tools/organization-apikeys.js";
+import { registerOrganizationMembershipsTools } from "./tools/organization-memberships.js";
 
 // --- MCP Server ---
 
@@ -43,6 +47,10 @@ registerDatasetTools(server);
 registerMetricsTools(server);
 registerScoreConfigTools(server);
 registerProjectTools(server);
+registerInstanceTools(server);
+registerOrganizationProjectsTools(server);
+registerOrganizationApiKeysTools(server);
+registerOrganizationMembershipsTools(server);
 
 // --- Start ---
 

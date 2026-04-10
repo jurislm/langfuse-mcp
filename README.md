@@ -1,8 +1,8 @@
 # langfuse-mcp
 
-MCP (Model Context Protocol) server for [Langfuse](https://langfuse.com) — provides 28 tools for prompt management, dataset operations, observability, and metrics tracking via natural language.
+MCP (Model Context Protocol) server for [Langfuse](https://langfuse.com) — provides 50 tools for prompt management, observability, instance/organization management, and metrics tracking via natural language.
 
-## Tools (28)
+## Tools (50)
 
 ### Prompt Management (6 tools)
 - `listPrompts` — List and filter prompts with pagination, labels, tags
@@ -49,6 +49,36 @@ MCP (Model Context Protocol) server for [Langfuse](https://langfuse.com) — pro
 
 ### Project (1 tool)
 - `getProject` — Get current project details (name, API keys, limits, usage)
+
+### Instance Management (8 tools)
+- `listInstances` — List all Langfuse instances with pagination
+- `getInstance` — Get details of a specific instance
+- `createInstance` — Create a new instance
+- `updateInstance` — Update an existing instance
+- `deleteInstance` — Delete an instance
+- `listInstanceEvents` — List events for an instance
+- `getInstanceStatus` — Get health and status information
+- `configureInstanceSettings` — Configure advanced settings
+
+### Organization Projects (5 tools)
+- `listOrganizationProjects` — List all projects within an organization
+- `getOrganizationProject` — Get details of a specific project
+- `createOrganizationProject` — Create a new project in an organization
+- `updateOrganizationProject` — Update an existing project
+- `deleteOrganizationProject` — Delete a project from an organization
+
+### Organization API Keys (3 tools)
+- `listOrganizationApiKeys` — List all API keys for an organization
+- `createOrganizationApiKey` — Create a new API key
+- `deleteOrganizationApiKey` — Delete an API key
+
+### Organization Memberships (6 tools)
+- `listOrganizationMembers` — List all members of an organization
+- `addOrganizationMember` — Add a new member to an organization
+- `updateOrganizationMember` — Update a member's role or permissions
+- `removeOrganizationMember` — Remove a member from an organization
+- `listProjectMembers` — List members with access to a specific project
+- `updateProjectMember` — Update a member's access level for a project
 
 ## Setup
 
