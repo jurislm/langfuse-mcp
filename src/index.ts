@@ -23,6 +23,7 @@ import { registerScoreTools } from "./tools/scores.js";
 import { registerSessionTools } from "./tools/sessions.js";
 import { registerDatasetTools } from "./tools/datasets.js";
 import { registerMetricsTools } from "./tools/metrics.js";
+import { registerScoreConfigTools } from "./tools/score-configs.js";
 
 // --- MCP Server ---
 
@@ -39,6 +40,7 @@ registerScoreTools(server);
 registerSessionTools(server);
 registerDatasetTools(server);
 registerMetricsTools(server);
+registerScoreConfigTools(server);
 
 // --- Start ---
 
