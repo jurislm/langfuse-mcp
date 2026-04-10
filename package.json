@@ -1,9 +1,15 @@
 {
   "name": "@jurislm/langfuse-mcp",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "JurisLM Langfuse MCP Server — Prompt Management + Traces/Observations 查詢",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "bin": {
+    "langfuse-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
@@ -16,6 +22,7 @@
     "langfuse": "^3.38.6",
     "zod": "^3.24.4"
   },
+  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/bun": "^1.2.13",
