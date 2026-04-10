@@ -61,8 +61,8 @@ export function registerInstanceTools(server: McpServer): void {
       name: z.string(),
       description: z.string().optional(),
       region: z.string().optional(),
-      maxUsers: z.number().int().optional(),
-      maxRequests: z.number().int().optional(),
+      maxUsers: z.number().int().min(1).optional(),
+      maxRequests: z.number().int().min(1).optional(),
     },
     async (input) => {
       const result = await langfuseApi("/api/admin/instances", {
@@ -89,8 +89,8 @@ export function registerInstanceTools(server: McpServer): void {
       instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
       name: z.string().optional(),
       description: z.string().optional(),
-      maxUsers: z.number().int().optional(),
-      maxRequests: z.number().int().optional(),
+      maxUsers: z.number().int().min(1).optional(),
+      maxRequests: z.number().int().min(1).optional(),
     },
     async (input) => {
       if (!input.name && input.description === undefined && input.maxUsers === undefined && input.maxRequests === undefined) {

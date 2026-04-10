@@ -18,8 +18,8 @@ export function registerTraceTools(server: McpServer): void {
       name: z.string().optional().describe("Filter by trace name"),
       userId: z.string().optional().describe("Filter by user ID"),
       tags: z.array(z.string()).optional().describe("Filter by tags"),
-      fromTimestamp: z.string().optional().describe("From timestamp (ISO 8601)"),
-      toTimestamp: z.string().optional().describe("To timestamp (ISO 8601)"),
+      fromTimestamp: z.string().datetime({ offset: true }).optional().describe("From timestamp (ISO 8601)"),
+      toTimestamp: z.string().datetime({ offset: true }).optional().describe("To timestamp (ISO 8601)"),
     },
     async (params) => {
       const result = await langfuseApi("/traces", {

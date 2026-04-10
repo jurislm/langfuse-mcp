@@ -13,8 +13,8 @@ export function registerMetricsTools(server: McpServer): void {
     "getDailyMetrics",
     "Get daily metrics for traces and observations (latency, tokens, scores, cost).",
     {
-      fromTimestamp: z.string().describe("From timestamp (ISO 8601)"),
-      toTimestamp: z.string().describe("To timestamp (ISO 8601)"),
+      fromTimestamp: z.string().datetime({ offset: true }).describe("From timestamp (ISO 8601)"),
+      toTimestamp: z.string().datetime({ offset: true }).describe("To timestamp (ISO 8601)"),
       name: z.string().optional().describe("Filter by trace/observation name"),
       userId: z.string().optional().describe("Filter by user ID"),
     },
@@ -35,8 +35,8 @@ export function registerMetricsTools(server: McpServer): void {
     "getUsageSummary",
     "Get usage summary for a time period (total traces, observations, tokens, cost).",
     {
-      fromTimestamp: z.string().describe("From timestamp (ISO 8601)"),
-      toTimestamp: z.string().describe("To timestamp (ISO 8601)"),
+      fromTimestamp: z.string().datetime({ offset: true }).describe("From timestamp (ISO 8601)"),
+      toTimestamp: z.string().datetime({ offset: true }).describe("To timestamp (ISO 8601)"),
     },
     async (params) => {
       const result = await langfuseApi("/metrics/summary", {

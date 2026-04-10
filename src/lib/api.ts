@@ -36,6 +36,11 @@ export const baseUrl = process.env.LANGFUSE_HOST ?? "https://cloud.langfuse.com"
 
 type AuthType = "basic" | "admin-bearer" | "org-bearer";
 
+const DEFAULT_TIMEOUT_MS = 30_000;
+
+/** Type-safe fetch function signature for dependency injection */
+type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
+
 /** Helper: get authorization header based on auth type */
 function getAuthHeader(authType: AuthType = "basic"): string {
   switch (authType) {
@@ -57,10 +62,14 @@ export async function langfuseApi(
     params?: Record<string, string | string[] | undefined>;
     authType?: AuthType;
     rawPath?: boolean;
+    timeout?: number;
+    fetcher?: Fetcher;
   }
 ): Promise<unknown> {
   const authType = opts?.authType ?? "basic";
   const rawPath = opts?.rawPath ?? false;
+  const timeout = opts?.timeout ?? DEFAULT_TIMEOUT_MS;
+  const fetcher = opts?.fetcher ?? fetch;
   const pathPrefix = rawPath ? "" : "/api/public";
   const url = new URL(`${pathPrefix}${path}`, baseUrl);
 
@@ -75,17 +84,49 @@ export async function langfuseApi(
       }
     }
   }
-  const res = await fetch(url.toString(), {
-    method: opts?.method ?? "GET",
-    headers: {
-      Authorization: getAuthHeader(authType),
-      "Content-Type": "application/json",
-    },
-    body: opts?.body ? JSON.stringify(opts.body) : undefined,
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Langfuse API ${res.status}: ${text}`);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetcher(url.toString(), {
+      method: opts?.method ?? "GET",
+      headers: {
+        Authorization: getAuthHeader(authType),
+        "Content-Type": "application/json",
+      },
+      body: opts?.body ? JSON.stringify(opts.body) : undefined,
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Langfuse API ${res.status}: ${text}`);
+    }
+
+    // Handle 204 No Content
+    if (res.status === 204) {
+      return null;
+    }
+
+    // Validate Content-Type before parsing JSON
+    const contentType = res.headers.get("Content-Type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await res.text();
+      throw new Error(
+        `Langfuse API returned unexpected Content-Type: ${contentType ?? "missing"}. Response: ${text}`
+      );
+    }
+
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error(`Langfuse API request timed out after ${timeout}ms`, {
+        cause: err,
+      });
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  return res.json();
 }

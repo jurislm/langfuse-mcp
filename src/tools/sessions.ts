@@ -15,8 +15,8 @@ export function registerSessionTools(server: McpServer): void {
     {
       page: z.number().int().min(1).default(1).describe("Page number"),
       limit: z.number().int().min(1).max(100).default(20).describe("Items per page"),
-      fromTimestamp: z.string().optional().describe("From timestamp (ISO 8601)"),
-      toTimestamp: z.string().optional().describe("To timestamp (ISO 8601)"),
+      fromTimestamp: z.string().datetime({ offset: true }).optional().describe("From timestamp (ISO 8601)"),
+      toTimestamp: z.string().datetime({ offset: true }).optional().describe("To timestamp (ISO 8601)"),
     },
     async (params) => {
       const result = await langfuseApi("/sessions", {

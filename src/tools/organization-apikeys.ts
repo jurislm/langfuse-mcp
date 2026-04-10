@@ -42,7 +42,7 @@ export function registerOrganizationApiKeysTools(server: McpServer): void {
       orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       name: z.string(),
       permissions: z.array(z.string()).optional(),
-      expiresAt: z.string().optional(),
+      expiresAt: z.string().datetime({ offset: true }).optional().describe("Expiration date (ISO 8601)"),
     },
     async (input) => {
       const result = await langfuseApi(
