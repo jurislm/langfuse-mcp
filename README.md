@@ -88,4 +88,4 @@ bun run lint       # ESLint (max-warnings=0)
 
 ## License
 
-Proprietary — JurisLM internal use
+MIT

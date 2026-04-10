@@ -21,6 +21,7 @@
     "langfuse": "^3.38.6",
     "zod": "^3.24.4"
   },
+  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/bun": "^1.2.13",
