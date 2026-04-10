@@ -34,7 +34,7 @@ import { registerOrganizationMembershipsTools } from "./tools/organization-membe
 
 const server = new McpServer({
   name: "jurislm-langfuse",
-  version: "1.0.0",
+  version: "1.1.0",
 });
 
 // Register all tools

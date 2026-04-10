@@ -60,7 +60,7 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     "Create a new project within an organization.",
     {
       orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
-      name: z.string(),
+      name: z.string().min(1),
       description: z.string().optional(),
       metadata: z.record(z.unknown()).optional(),
     },
@@ -89,7 +89,7 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     {
       orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       projectId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid project ID format"),
-      name: z.string().optional(),
+      name: z.string().min(1).optional(),
       description: z.string().optional(),
       metadata: z.record(z.unknown()).optional(),
     },

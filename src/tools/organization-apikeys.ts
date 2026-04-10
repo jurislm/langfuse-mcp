@@ -40,7 +40,7 @@ export function registerOrganizationApiKeysTools(server: McpServer): void {
     "Create a new API key for an organization.",
     {
       orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
-      name: z.string(),
+      name: z.string().min(1),
       permissions: z.array(z.string()).optional(),
       expiresAt: z.string().datetime({ offset: true }).optional().describe("Expiration date (ISO 8601)"),
     },

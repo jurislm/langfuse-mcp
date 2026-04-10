@@ -85,9 +85,18 @@ MCP (Model Context Protocol) server for [Langfuse](https://langfuse.com) — pro
 ### Environment Variables
 
 ```bash
+# Public API (Required for Prompt Management, Traces, Observations, Scores, Sessions, etc.)
 LANGFUSE_PUBLIC_KEY=pk-lf-...
 LANGFUSE_SECRET_KEY=sk-lf-...
-LANGFUSE_HOST=https://cloud.langfuse.com  # optional, defaults to cloud.langfuse.com
+
+# Instance/Organization Management APIs (Required for Instance and Organization tools)
+LANGFUSE_ADMIN_API_KEY=adm-lf-...
+
+# Optional: Organization-specific API key for additional org-level tools
+LANGFUSE_ORG_API_KEY=org-lf-...
+
+# Optional: API Server (defaults to https://cloud.langfuse.com)
+LANGFUSE_HOST=https://cloud.langfuse.com
 # US region: https://us.cloud.langfuse.com
 ```
 

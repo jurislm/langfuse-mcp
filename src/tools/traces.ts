@@ -28,6 +28,7 @@ export function registerTraceTools(server: McpServer): void {
           limit: String(params.limit),
           ...(params.name && { name: params.name }),
           ...(params.userId && { userId: params.userId }),
+          ...(params.tags && { tags: params.tags }),
           ...(params.fromTimestamp && { fromTimestamp: params.fromTimestamp }),
           ...(params.toTimestamp && { toTimestamp: params.toTimestamp }),
         },

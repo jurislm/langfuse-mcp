@@ -58,7 +58,7 @@ export function registerInstanceTools(server: McpServer): void {
     "createInstance",
     "Create a new Langfuse instance.",
     {
-      name: z.string(),
+      name: z.string().min(1),
       description: z.string().optional(),
       region: z.string().optional(),
       maxUsers: z.number().int().min(1).optional(),
