@@ -39,7 +39,7 @@ export function registerInstanceTools(server: McpServer): void {
     "getInstance",
     "Get details of a specific Langfuse instance.",
     {
-      instanceId: z.string(),
+      instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
     },
     async (input) => {
       const result = await langfuseApi(
@@ -86,13 +86,16 @@ export function registerInstanceTools(server: McpServer): void {
     "updateInstance",
     "Update an existing Langfuse instance.",
     {
-      instanceId: z.string(),
+      instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
       name: z.string().optional(),
       description: z.string().optional(),
       maxUsers: z.number().int().optional(),
       maxRequests: z.number().int().optional(),
     },
     async (input) => {
+      if (!input.name && input.description === undefined && input.maxUsers === undefined && input.maxRequests === undefined) {
+        throw new Error("At least one field (name, description, maxUsers, or maxRequests) must be provided");
+      }
       const result = await langfuseApi(
         `/api/admin/instances/${input.instanceId}`,
         {
@@ -116,7 +119,7 @@ export function registerInstanceTools(server: McpServer): void {
     "deleteInstance",
     "Delete a Langfuse instance.",
     {
-      instanceId: z.string(),
+      instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
     },
     async (input) => {
       const result = await langfuseApi(
@@ -136,7 +139,7 @@ export function registerInstanceTools(server: McpServer): void {
     "listInstanceEvents",
     "List events for a Langfuse instance.",
     {
-      instanceId: z.string(),
+      instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
       eventType: z.string().optional(),
       page: z.number().int().min(1).optional(),
       limit: z.number().int().min(1).max(100).optional(),
@@ -163,7 +166,7 @@ export function registerInstanceTools(server: McpServer): void {
     "getInstanceStatus",
     "Get health and status information for a Langfuse instance.",
     {
-      instanceId: z.string(),
+      instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
     },
     async (input) => {
       const result = await langfuseApi(
@@ -182,7 +185,7 @@ export function registerInstanceTools(server: McpServer): void {
     "configureInstanceSettings",
     "Configure advanced settings for a Langfuse instance.",
     {
-      instanceId: z.string(),
+      instanceId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid instance ID format"),
       settings: z.record(z.unknown()),
     },
     async (input) => {

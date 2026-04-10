@@ -14,7 +14,7 @@ export function registerOrganizationApiKeysTools(server: McpServer): void {
     "listOrganizationApiKeys",
     "List all API keys for an organization.",
     {
-      orgId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       page: z.number().int().min(1).optional(),
       limit: z.number().int().min(1).max(100).optional(),
     },
@@ -39,7 +39,7 @@ export function registerOrganizationApiKeysTools(server: McpServer): void {
     "createOrganizationApiKey",
     "Create a new API key for an organization.",
     {
-      orgId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       name: z.string(),
       permissions: z.array(z.string()).optional(),
       expiresAt: z.string().optional(),
@@ -67,8 +67,8 @@ export function registerOrganizationApiKeysTools(server: McpServer): void {
     "deleteOrganizationApiKey",
     "Delete an API key from an organization.",
     {
-      orgId: z.string(),
-      keyId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      keyId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid key ID format"),
     },
     async (input) => {
       const result = await langfuseApi(

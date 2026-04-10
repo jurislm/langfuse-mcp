@@ -14,7 +14,7 @@ export function registerOrganizationMembershipsTools(server: McpServer): void {
     "listOrganizationMembers",
     "List all members of an organization.",
     {
-      orgId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       page: z.number().int().min(1).optional(),
       limit: z.number().int().min(1).max(100).optional(),
       role: z.enum(["owner", "admin", "member", "viewer"]).optional(),
@@ -41,7 +41,7 @@ export function registerOrganizationMembershipsTools(server: McpServer): void {
     "addOrganizationMember",
     "Add a new member to an organization.",
     {
-      orgId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       email: z.string().email(),
       role: z.enum(["owner", "admin", "member", "viewer"]),
     },
@@ -67,11 +67,14 @@ export function registerOrganizationMembershipsTools(server: McpServer): void {
     "updateOrganizationMember",
     "Update an organization member's role or permissions.",
     {
-      orgId: z.string(),
-      memberId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      memberId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid member ID format"),
       role: z.enum(["owner", "admin", "member", "viewer"]).optional(),
     },
     async (input) => {
+      if (input.role === undefined) {
+        throw new Error("At least one field (role) must be provided");
+      }
       const result = await langfuseApi(
         `/api/admin/organizations/${input.orgId}/members/${input.memberId}`,
         {
@@ -92,8 +95,8 @@ export function registerOrganizationMembershipsTools(server: McpServer): void {
     "removeOrganizationMember",
     "Remove a member from an organization.",
     {
-      orgId: z.string(),
-      memberId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      memberId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid member ID format"),
     },
     async (input) => {
       const result = await langfuseApi(
@@ -113,8 +116,8 @@ export function registerOrganizationMembershipsTools(server: McpServer): void {
     "listProjectMembers",
     "List all members with access to a specific project within an organization.",
     {
-      orgId: z.string(),
-      projectId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      projectId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid project ID format"),
       page: z.number().int().min(1).optional(),
       limit: z.number().int().min(1).max(100).optional(),
     },
@@ -139,12 +142,15 @@ export function registerOrganizationMembershipsTools(server: McpServer): void {
     "updateProjectMember",
     "Update a member's access level for a specific project.",
     {
-      orgId: z.string(),
-      projectId: z.string(),
-      memberId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      projectId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid project ID format"),
+      memberId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid member ID format"),
       role: z.enum(["owner", "admin", "member", "viewer"]).optional(),
     },
     async (input) => {
+      if (input.role === undefined) {
+        throw new Error("At least one field (role) must be provided");
+      }
       const result = await langfuseApi(
         `/api/admin/organizations/${input.orgId}/projects/${input.projectId}/members/${input.memberId}`,
         {

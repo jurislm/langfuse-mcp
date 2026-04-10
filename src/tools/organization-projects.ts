@@ -14,7 +14,7 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     "listOrganizationProjects",
     "List all projects within an organization.",
     {
-      orgId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       page: z.number().int().min(1).optional(),
       limit: z.number().int().min(1).max(100).optional(),
     },
@@ -39,8 +39,8 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     "getOrganizationProject",
     "Get details of a specific project within an organization.",
     {
-      orgId: z.string(),
-      projectId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      projectId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid project ID format"),
     },
     async (input) => {
       const result = await langfuseApi(
@@ -59,7 +59,7 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     "createOrganizationProject",
     "Create a new project within an organization.",
     {
-      orgId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
       name: z.string(),
       description: z.string().optional(),
       metadata: z.record(z.unknown()).optional(),
@@ -87,13 +87,16 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     "updateOrganizationProject",
     "Update an existing project within an organization.",
     {
-      orgId: z.string(),
-      projectId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      projectId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid project ID format"),
       name: z.string().optional(),
       description: z.string().optional(),
       metadata: z.record(z.unknown()).optional(),
     },
     async (input) => {
+      if (!input.name && input.description === undefined && input.metadata === undefined) {
+        throw new Error("At least one field (name, description, or metadata) must be provided");
+      }
       const result = await langfuseApi(
         `/api/admin/organizations/${input.orgId}/projects/${input.projectId}`,
         {
@@ -116,8 +119,8 @@ export function registerOrganizationProjectsTools(server: McpServer): void {
     "deleteOrganizationProject",
     "Delete a project from an organization.",
     {
-      orgId: z.string(),
-      projectId: z.string(),
+      orgId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid organization ID format"),
+      projectId: z.string().regex(/^[a-zA-Z0-9_-]+$/, "Invalid project ID format"),
     },
     async (input) => {
       const result = await langfuseApi(

@@ -5,9 +5,14 @@
  */
 
 export function getBasicAuthHeader(): string {
-  const token = Buffer.from(
-    `${process.env.LANGFUSE_PUBLIC_KEY}:${process.env.LANGFUSE_SECRET_KEY}`
-  ).toString("base64");
+  const publicKey = process.env.LANGFUSE_PUBLIC_KEY;
+  const secretKey = process.env.LANGFUSE_SECRET_KEY;
+
+  if (!publicKey || !secretKey) {
+    throw new Error("LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY must be configured");
+  }
+
+  const token = Buffer.from(`${publicKey}:${secretKey}`).toString("base64");
   return `Basic ${token}`;
 }
 
