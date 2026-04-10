@@ -1,6 +1,6 @@
 # CLAUDE.md — JurisLM Langfuse MCP Server
 
-JurisLM 專用的 Langfuse MCP Server，提供 13 個工具用於 prompt 管理與可觀測性查詢。
+JurisLM 專用的 Langfuse MCP Server，提供 50 個工具用於 prompt 管理、可觀測性、實例管理與組織管理。
 
 ## 常用命令
 
@@ -14,9 +14,11 @@ bun run lint             # ESLint 檢查（max-warnings=0）
 bun run build            # 編譯到 dist/
 
 # 環境變數
-export LANGFUSE_PUBLIC_KEY=pk-lf-...
-export LANGFUSE_SECRET_KEY=sk-lf-...
-export LANGFUSE_HOST=https://cloud.langfuse.com  # 預設，可省略
+export LANGFUSE_PUBLIC_KEY=pk-lf-...              # 公開 API 認證
+export LANGFUSE_SECRET_KEY=sk-lf-...              # 公開 API 認證
+export LANGFUSE_ADMIN_API_KEY=adm-lf-...          # Admin API 認證（Instance/Organization）
+export LANGFUSE_ORG_API_KEY=org-lf-...            # 組織 API 認證（可選）
+export LANGFUSE_HOST=https://cloud.langfuse.com   # 預設，可省略
 ```
 
 ## Repository 概覽
@@ -36,99 +38,123 @@ export LANGFUSE_HOST=https://cloud.langfuse.com  # 預設，可省略
 
 ```
 src/
-├── index.ts           # MCP server 實現，13 個 tools 定義
-                       # 1. Prompt Management（6 tools）
-                       # 2. Traces（2 tools）
-                       # 3. Observations（2 tools）
-                       # 4. Scores（2 tools）
-                       # 5. Sessions（1 tool）
+├── index.ts           # MCP server 主入點，50 個 tools 註冊點
+├── lib/
+│   └── api.ts         # Langfuse API 客戶端（支援 Basic Auth / Bearer Token）
+└── tools/
+    ├── prompts.ts                 # Prompt Management（6 tools）
+    ├── traces.ts                  # Traces（2 tools）
+    ├── observations.ts            # Observations（2 tools）
+    ├── scores.ts                  # Scores（2 tools）
+    ├── sessions.ts                # Sessions（1 tool）
+    ├── datasets.ts                # Dataset Management（8 tools）
+    ├── metrics.ts                 # Metrics Query（2 tools）
+    ├── score-configs.ts           # Score Configuration（4 tools）
+    ├── projects.ts                # Project Query（1 tool）
+    ├── instance-management.ts     # Instance Management（8 tools）
+    ├── organization-projects.ts   # Organization Projects（5 tools）
+    ├── organization-apikeys.ts    # Organization API Keys（3 tools）
+    └── organization-memberships.ts # Organization Memberships（6 tools）
 ```
 
-## 工具分類詳解
+## 工具分類概述
 
-### 1. Prompt Management（6 tools）
-複製官方 Langfuse MCP 的 prompt API，超高階版本控制：
+**詳細的工具列表和參數說明見 README.md。**
 
-- **listPrompts** — 列舉所有 prompts，支援分頁、名稱篩選、標籤篩選
-- **getPrompt** — 取得指定 prompt 版本，自動解析依賴（用於 prompt composition）
-- **createTextPrompt** — 建立新的文字 prompt 版本，支援 `{{variable}}` 語法
-- **createChatPrompt** — 建立新的聊天 prompt（role-based messages：system/user/assistant）
-- **getPromptUnresolved** — 取得 prompt 但**不解析依賴**（用於偵錯 prompt 組合）
-- **updatePromptLabels** — 更新 prompt 版本的標籤（標籤在版本間是 unique 的）
+### Tool Categories (50 total)
 
-**設計模式**：Prompts 是不可變的，每次修改都建立新版本。用標籤（如 "production"）指向特定版本。
+**Phase 1-3（Public API）— 28 tools**
+1. **Prompt Management** (6 tools) — Version control & composition for prompts
+2. **Traces** (2 tools) — Execution tracking & debugging
+3. **Observations** (2 tools) — LLM calls & system operations analysis
+4. **Scores** (2 tools) — Quality metrics & evaluation feedback
+5. **Sessions** (1 tool) — Grouping related traces
+6. **Datasets** (8 tools) — Eval data preparation & execution tracking
+7. **Metrics** (2 tools) — Usage & performance summary
+8. **Score Configurations** (4 tools) — Custom scoring metric definitions
+9. **Project** (1 tool) — Current project metadata
 
-### 2. Traces（2 tools）
-執行追蹤查詢（JurisLM 擴充）：
-
-- **listTraces** — 列舉 traces，支援按名稱、userId、標籤、時間範圍篩選
-- **getTrace** — 取得單個 trace 及其所有 observations 和 scores
-
-**用途**：查詢 agents 的執行記錄，分析決策過程。
-
-### 3. Observations（2 tools）
-觀測點查詢（JurisLM 擴充）：
-
-- **listObservations** — 列舉 observations（GENERATION/SPAN/EVENT），支援按 type/name/traceId 篩選
-- **getObservation** — 取得單個 observation 的完整詳情（input/output/usage/model/duration）
-
-**用途**：分析 LLM 調用、API 響應、系統操作等細節。
-
-### 4. Scores（2 tools）
-評分管理（JurisLM 擴充）：
-
-- **createScore** — 為 trace 或 observation 建立評分（用於 evals、用戶反饋、品質指標）
-- **listScores** — 列舉 scores，支援按名稱、userId、traceId 篩選
-
-**用途**：記錄執行品質指標，訓練改進迴圈。
-
-### 5. Sessions（1 tool）
-會話查詢（JurisLM 擴充）：
-
-- **listSessions** — 列舉 sessions（group 相關 traces），支援時間範圍篩選
-
-**用途**：組織相關的執行記錄。
+**Phase 4-5（Admin/Organization APIs）— 22 tools**
+10. **Instance Management** (8 tools) — Instance lifecycle & configuration
+11. **Organization Projects** (5 tools) — Project management within organizations
+12. **Organization API Keys** (3 tools) — Org-level API key management
+13. **Organization Memberships** (6 tools) — Member & permission management
 
 ## 環境變數
 
 | 變數 | 必需 | 說明 | 範例 |
 |------|------|------|------|
-| `LANGFUSE_PUBLIC_KEY` | ✓ | 公開金鑰 | `pk-lf-xxxxx` |
-| `LANGFUSE_SECRET_KEY` | ✓ | 密鑰 | `sk-lf-xxxxx` |
+| `LANGFUSE_PUBLIC_KEY` | ✓ | 公開 API 金鑰 | `pk-lf-xxxxx` |
+| `LANGFUSE_SECRET_KEY` | ✓ | 公開 API 密鑰 | `sk-lf-xxxxx` |
+| `LANGFUSE_ADMIN_API_KEY` | ✓* | Admin API Bearer Token | `adm-lf-xxxxx` |
+| `LANGFUSE_ORG_API_KEY` | ✗ | 組織 API Bearer Token（可選） | `org-lf-xxxxx` |
 | `LANGFUSE_HOST` | ✗ | API 伺服器地址（預設 cloud.langfuse.com） | `https://cloud.langfuse.com` |
+
+\* 若使用 Instance/Organization 管理工具則必需
 
 ## 實現細節
 
-### 認證
-使用 HTTP Basic Auth（base64 編碼 `PUBLIC_KEY:SECRET_KEY`），Langfuse 公開 API 標準方式。
+### 認證機制
+- **Basic Auth**：用於公開 API（`/api/public/*`）
+  - Base64 編碼 `PUBLIC_KEY:SECRET_KEY`
+  - 工具：Prompt、Traces、Observations、Scores、Sessions、Datasets、Metrics、Score Configs、Project
+- **Bearer Token（Admin）**：用於 Instance/Organization 管理（`/api/admin/*`）
+  - `Authorization: Bearer LANGFUSE_ADMIN_API_KEY`
+  - 工具：Instance Management、Organization Projects、Organization API Keys、Organization Memberships
 
 ### API 端點
-直接呼叫 Langfuse `/api/public/*` 端點：
-- `/v2/prompts` — Prompt Management
-- `/traces` — Traces
-- `/observations` — Observations
-- `/scores` — Scores
-- `/sessions` — Sessions
+- Public API：`/api/public/v2/*`
+  - `/prompts`, `/traces`, `/observations`, `/scores`, `/sessions`
+- Admin API：`/api/admin/*`
+  - `/instances`, `/organizations/{orgId}/projects`, `/organizations/{orgId}/api-keys`, `/organizations/{orgId}/members`
+
+### API 客戶端
+`langfuseApi()` 函數支援多認證方式：
+```typescript
+langfuseApi(path, {
+  authType: "basic" | "admin-bearer" | "org-bearer",
+  rawPath: boolean,  // 跳過 /api/public 前綴
+  params: {...},
+  body: {...}
+})
+```
 
 ### 錯誤處理
 所有 API 呼叫失敗時拋出 Error，包含 HTTP status + 回應文本。
 
 ## 開發指南
 
-### 新增工具
-1. 在 `src/index.ts` 內加入 `server.tool()` 呼叫
-2. 定義 Zod schema（輸入參數驗證）
-3. 實現非同步 handler，呼叫 `langfuseApi()`
-4. 回傳 MCP 格式：`{ content: [{ type: "text", text: JSON.stringify(...) }] }`
+### 新增工具（模組化模式）
+1. 建立新工具模組 `src/tools/feature-name.ts`
+2. 定義 `registerFeatureTools(server: McpServer): void` 函數
+3. 在該函數內呼叫 `server.tool()`
+4. 定義 Zod schema（輸入參數驗證）
+5. 實現非同步 handler，呼叫 `langfuseApi()`
+6. 在 `src/index.ts` 內 import 並呼叫 `registerFeatureTools(server)`
+
+### 多認證支援
+新工具若需要不同認證方式，修改 `langfuseApi()` 呼叫：
+```typescript
+await langfuseApi(path, {
+  authType: "admin-bearer",  // 切換認證類型
+  rawPath: true,             // 若需要跳過 /api/public 前綴
+})
+```
 
 ### 版本號
 `package.json` 中的 `version` 字段由 Release Please 管理，勿手動修改。
 
 ### 類型檢查
-`tsc --noEmit` 強制檢查（CI 必過）。
+`bun run typecheck` 強制檢查（CI 必過）。
 
-### ESLint
-`eslint --max-warnings=0` 強制零警告（CI 必過）。
+### Linting
+`bun run lint` 強制零警告（CI 必過）。
+
+### 開發流程
+```bash
+bun run dev        # 啟動開發伺服器
+bun run build      # 編譯到 dist/
+```
 
 ## 部署
 
