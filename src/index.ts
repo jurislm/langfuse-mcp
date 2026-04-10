@@ -22,6 +22,7 @@ import { registerObservationTools } from "./tools/observations.js";
 import { registerScoreTools } from "./tools/scores.js";
 import { registerSessionTools } from "./tools/sessions.js";
 import { registerDatasetTools } from "./tools/datasets.js";
+import { registerMetricsTools } from "./tools/metrics.js";
 
 // --- MCP Server ---
 
@@ -37,6 +38,7 @@ registerObservationTools(server);
 registerScoreTools(server);
 registerSessionTools(server);
 registerDatasetTools(server);
+registerMetricsTools(server);
 
 // --- Start ---
 
