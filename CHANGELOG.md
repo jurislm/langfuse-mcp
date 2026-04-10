@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/jurislm/langfuse-mcp/compare/v1.1.0...v1.1.1) (2026-04-10)
+
+
+### Documentation
+
+* update README with npx install instructions and plugin usage ([ea82ea2](https://github.com/jurislm/langfuse-mcp/commit/ea82ea206d9ce8cd25428f6c450781e1d685b784))
+* use bunx instead of npx in MCP configuration example ([755cf76](https://github.com/jurislm/langfuse-mcp/commit/755cf76d3d58df5944ba9f5df52cc6cfbef90797))
+
 ## [1.1.0](https://github.com/jurislm/langfuse-mcp/compare/v1.0.1...v1.1.0) (2026-04-10)
 
 
