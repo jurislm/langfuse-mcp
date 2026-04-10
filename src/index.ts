@@ -24,6 +24,7 @@ import { registerSessionTools } from "./tools/sessions.js";
 import { registerDatasetTools } from "./tools/datasets.js";
 import { registerMetricsTools } from "./tools/metrics.js";
 import { registerScoreConfigTools } from "./tools/score-configs.js";
+import { registerProjectTools } from "./tools/projects.js";
 
 // --- MCP Server ---
 
@@ -41,6 +42,7 @@ registerSessionTools(server);
 registerDatasetTools(server);
 registerMetricsTools(server);
 registerScoreConfigTools(server);
+registerProjectTools(server);
 
 // --- Start ---
 
