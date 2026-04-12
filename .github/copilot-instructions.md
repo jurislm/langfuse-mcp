@@ -1,3 +1,5 @@
+請使用繁體中文回覆所有問題與建議。
+
 # Copilot Instructions for langfuse-mcp
 
 ## Project Overview
