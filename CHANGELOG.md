@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/jurislm/langfuse-mcp/compare/v1.1.1...v1.1.2) (2026-04-12)
+
+
+### Refactoring
+
+* Comprehensive Langfuse MCP with 50 tools, schema validation, and API testing ([3a21373](https://github.com/jurislm/langfuse-mcp/commit/3a213734e7a5a0704c7e030838cc71a53567f840))
+
 ## [1.1.1](https://github.com/jurislm/langfuse-mcp/compare/v1.1.0...v1.1.1) (2026-04-10)
 
 
