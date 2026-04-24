@@ -20,8 +20,8 @@ export function registerSessionTools(
       const result = await client.fetchSessions({
         page: params.page,
         limit: params.limit,
-        ...(params.fromTimestamp && { fromTimestamp: params.fromTimestamp }),
-        ...(params.toTimestamp && { toTimestamp: params.toTimestamp }),
+        ...(params.fromTimestamp && { fromTimestamp: new Date(params.fromTimestamp) }),
+        ...(params.toTimestamp && { toTimestamp: new Date(params.toTimestamp) }),
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }

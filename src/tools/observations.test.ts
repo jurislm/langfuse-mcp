@@ -55,7 +55,7 @@ describe("registerObservationTools", () => {
       });
 
       expect(mockFetchObservations).toHaveBeenCalledTimes(1);
-      const callArgs = mockFetchObservations.mock.calls[0][0];
+      const callArgs = (mockFetchObservations.mock.calls as unknown as Array<[Record<string, unknown>]>)[0][0];
       expect(callArgs).toMatchObject({
         page: 2,
         limit: 10,

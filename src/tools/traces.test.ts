@@ -57,15 +57,15 @@ describe("registerTraceTools", () => {
       });
 
       expect(mockFetchTraces).toHaveBeenCalledTimes(1);
-      const callArgs = mockFetchTraces.mock.calls[0][0];
+      const callArgs = (mockFetchTraces.mock.calls as unknown as Array<[Record<string, unknown>]>)[0][0];
       expect(callArgs).toMatchObject({
         page: 2,
         limit: 10,
         name: "my-trace",
         userId: "user-123",
         tags: ["tag1", "tag2"],
-        fromTimestamp: "2024-01-01T00:00:00Z",
-        toTimestamp: "2024-12-31T23:59:59Z",
+        fromTimestamp: new Date("2024-01-01T00:00:00Z"),
+        toTimestamp: new Date("2024-12-31T23:59:59Z"),
       });
     });
 

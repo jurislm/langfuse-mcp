@@ -47,12 +47,12 @@ describe("registerSessionTools", () => {
       });
 
       expect(mockFetchSessions).toHaveBeenCalledTimes(1);
-      const callArgs = mockFetchSessions.mock.calls[0][0];
+      const callArgs = (mockFetchSessions.mock.calls as unknown as Array<[Record<string, unknown>]>)[0][0];
       expect(callArgs).toMatchObject({
         page: 2,
         limit: 10,
-        fromTimestamp: "2024-01-01T00:00:00Z",
-        toTimestamp: "2024-12-31T23:59:59Z",
+        fromTimestamp: new Date("2024-01-01T00:00:00Z"),
+        toTimestamp: new Date("2024-12-31T23:59:59Z"),
       });
     });
 

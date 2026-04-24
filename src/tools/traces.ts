@@ -26,8 +26,8 @@ export function registerTraceTools(
         ...(params.name && { name: params.name }),
         ...(params.userId && { userId: params.userId }),
         ...(params.tags && { tags: params.tags }),
-        ...(params.fromTimestamp && { fromTimestamp: params.fromTimestamp }),
-        ...(params.toTimestamp && { toTimestamp: params.toTimestamp }),
+        ...(params.fromTimestamp && { fromTimestamp: new Date(params.fromTimestamp) }),
+        ...(params.toTimestamp && { toTimestamp: new Date(params.toTimestamp) }),
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
