@@ -1,8 +1,34 @@
-/**
- * Langfuse API 客戶端
- *
- * 提供 REST API 呼叫助手，支援 Basic Auth、Admin API、Instance/Organization APIs
- */
+/** Structured error from the Langfuse REST API, carrying the HTTP status code. */
+export class LangfuseApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string
+  ) {
+    super(`Langfuse API ${status}: ${message}`);
+    this.name = "LangfuseApiError";
+  }
+}
+
+/** Retry a function on 429 errors using the provided delay sequence (ms). */
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  opts: { retryDelays: number[] }
+): Promise<T> {
+  const delays = [...opts.retryDelays];
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      if (!(err instanceof LangfuseApiError) || err.status !== 429) throw err;
+      if (attempt < delays.length) {
+        await new Promise((r) => setTimeout(r, delays[attempt]));
+      }
+    }
+  }
+  throw lastError;
+}
 
 export function getBasicAuthHeader(): string {
   const publicKey = process.env.LANGFUSE_PUBLIC_KEY;
@@ -101,7 +127,7 @@ export async function langfuseApi(
 
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`Langfuse API ${res.status}: ${text}`);
+      throw new LangfuseApiError(res.status, text);
     }
 
     // Handle 204 No Content

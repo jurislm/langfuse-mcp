@@ -6,7 +6,7 @@
       "name": "@jurislm/langfuse-mcp",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.12.1",
-        "langfuse": "^3.38.6",
+        "langfuse": "^3.38.20",
         "zod": "^3.24.4",
       },
       "devDependencies": {
