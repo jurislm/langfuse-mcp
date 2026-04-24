@@ -1,14 +1,12 @@
-/**
- * Observation Query Tools
- *
- * 觀測點查詢（JurisLM 擴充）
- */
-
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { langfuseApi } from "../lib/api.js";
+import { getLangfuseClient } from "../lib/client.js";
+import type { Langfuse } from "langfuse";
 
-export function registerObservationTools(server: McpServer): void {
+export function registerObservationTools(
+  server: McpServer,
+  client: Pick<Langfuse, "fetchObservations" | "fetchObservation"> = getLangfuseClient()
+): void {
   server.tool(
     "listObservations",
     "List observations (generations, spans, events) with filters. High-performance endpoint with selective field retrieval.",
@@ -20,14 +18,12 @@ export function registerObservationTools(server: McpServer): void {
       page: z.number().int().min(1).default(1).describe("Page number"),
     },
     async (params) => {
-      const result = await langfuseApi("/observations", {
-        params: {
-          page: String(params.page),
-          limit: String(params.limit),
-          ...(params.traceId && { traceId: params.traceId }),
-          ...(params.type && { type: params.type }),
-          ...(params.name && { name: params.name }),
-        },
+      const result = await client.fetchObservations({
+        page: params.page,
+        limit: params.limit,
+        ...(params.traceId && { traceId: params.traceId }),
+        ...(params.type && { type: params.type }),
+        ...(params.name && { name: params.name }),
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
@@ -40,7 +36,7 @@ export function registerObservationTools(server: McpServer): void {
       observationId: z.string().min(1).describe("Observation ID"),
     },
     async (params) => {
-      const result = await langfuseApi(`/observations/${encodeURIComponent(params.observationId)}`);
+      const result = await client.fetchObservation(params.observationId);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
   );
