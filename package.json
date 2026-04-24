@@ -1,6 +1,6 @@
 {
   "name": "@jurislm/langfuse-mcp",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "JurisLM Langfuse MCP Server — Prompt Management + Traces/Observations 查詢",
   "type": "module",
   "main": "dist/index.js",
