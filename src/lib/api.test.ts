@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "bun:test";
-import { langfuseApi } from "./api.js";
+import { langfuseApi, LangfuseApiError, withRetry } from "./api.js";
 
 describe("langfuseApi", () => {
   beforeEach(() => {
@@ -182,7 +182,7 @@ describe("langfuseApi", () => {
   });
 
   describe("error handling", () => {
-    it("should throw error for non-ok response", async () => {
+    it("should throw LangfuseApiError for non-ok response", async () => {
       const mockFetcher = async (): Promise<Response> => {
         return new Response("Not Found", {
           status: 404,
@@ -195,7 +195,9 @@ describe("langfuseApi", () => {
         });
         expect.unreachable();
       } catch (err) {
-        const error = err as Error;
+        expect(err).toBeInstanceOf(LangfuseApiError);
+        const error = err as LangfuseApiError;
+        expect(error.status).toBe(404);
         expect(error.message).toContain("404");
         expect(error.message).toContain("Not Found");
       }
@@ -216,5 +218,90 @@ describe("langfuseApi", () => {
         expect(error.message).toContain("Network error");
       }
     });
+  });
+});
+
+describe("LangfuseApiError", () => {
+  it("should be an instance of Error", () => {
+    const err = new LangfuseApiError(404, "Not Found");
+    expect(err).toBeInstanceOf(Error);
+  });
+
+  it("should expose status code", () => {
+    const err = new LangfuseApiError(429, "Too Many Requests");
+    expect(err.status).toBe(429);
+  });
+
+  it("should preserve message", () => {
+    const err = new LangfuseApiError(500, "Internal Server Error");
+    expect(err.message).toContain("500");
+    expect(err.message).toContain("Internal Server Error");
+  });
+});
+
+describe("withRetry", () => {
+  it("should return result on first success", async () => {
+    const fn = async () => "ok";
+    const result = await withRetry(fn, { retryDelays: [1, 1, 1] });
+    expect(result).toBe("ok");
+  });
+
+  it("should retry on 429 LangfuseApiError and eventually succeed", async () => {
+    let calls = 0;
+    const fn = async () => {
+      calls++;
+      if (calls < 3) throw new LangfuseApiError(429, "Too Many Requests");
+      return "success";
+    };
+    const result = await withRetry(fn, { retryDelays: [1, 1, 1] });
+    expect(result).toBe("success");
+    expect(calls).toBe(3);
+  });
+
+  it("should NOT retry on non-429 LangfuseApiError", async () => {
+    let calls = 0;
+    const fn = async () => {
+      calls++;
+      throw new LangfuseApiError(404, "Not Found");
+    };
+    try {
+      await withRetry(fn, { retryDelays: [1, 1, 1] });
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(LangfuseApiError);
+      expect((err as LangfuseApiError).status).toBe(404);
+      expect(calls).toBe(1);
+    }
+  });
+
+  it("should throw after exhausting retries on repeated 429", async () => {
+    let calls = 0;
+    const fn = async () => {
+      calls++;
+      throw new LangfuseApiError(429, "Too Many Requests");
+    };
+    try {
+      await withRetry(fn, { retryDelays: [1, 1, 1] });
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(LangfuseApiError);
+      expect((err as LangfuseApiError).status).toBe(429);
+      expect(calls).toBe(4); // initial + 3 retries
+    }
+  });
+
+  it("should NOT retry on non-LangfuseApiError", async () => {
+    let calls = 0;
+    const fn = async () => {
+      calls++;
+      throw new Error("Network failure");
+    };
+    try {
+      await withRetry(fn, { retryDelays: [1, 1, 1] });
+      expect.unreachable();
+    } catch (err) {
+      expect((err as Error).message).toContain("Network failure");
+      expect(calls).toBe(1);
+    }
   });
 });
