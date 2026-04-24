@@ -2,7 +2,7 @@ import { describe, it, expect, mock, beforeEach } from "bun:test";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerSessionTools } from "./sessions.js";
 
-type ToolHandler = (params: Record<string, unknown>) => Promise<{ content: { type: string; text: string }[] }>;
+type ToolHandler = (params: Record<string, unknown>) => Promise<{ isError?: boolean; content: { type: string; text: string }[] }>;
 
 function makeMockServer() {
   const handlers: Record<string, ToolHandler> = {};
@@ -34,6 +34,20 @@ describe("registerSessionTools", () => {
     expect(Object.keys(handlers)).toContain("listSessions");
   });
 
+  describe("error handling", () => {
+    it("should return isError response when SDK throws", async () => {
+      const errorClient = {
+        fetchSessions: mock(async () => { throw new Error("Network failure"); }),
+      };
+      const { server, handlers } = makeMockServer();
+      registerSessionTools(server, errorClient as never);
+
+      const result = await handlers["listSessions"]({ page: 1, limit: 20 });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("Network failure");
+    });
+  });
+
   describe("listSessions", () => {
     it("should call client.fetchSessions with correct params", async () => {
       const { server, handlers } = makeMockServer();
@@ -47,7 +61,7 @@ describe("registerSessionTools", () => {
       });
 
       expect(mockFetchSessions).toHaveBeenCalledTimes(1);
-      const callArgs = (mockFetchSessions.mock.calls as unknown as Array<[Record<string, unknown>]>)[0][0];
+      const callArgs = (mockFetchSessions.mock.calls as unknown as Array<unknown[]>)[0][0] as Record<string, unknown>;
       expect(callArgs).toMatchObject({
         page: 2,
         limit: 10,

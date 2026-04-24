@@ -18,14 +18,19 @@ export function registerObservationTools(
       page: z.number().int().min(1).default(1).describe("Page number"),
     },
     async (params) => {
-      const result = await client.fetchObservations({
-        page: params.page,
-        limit: params.limit,
-        ...(params.traceId && { traceId: params.traceId }),
-        ...(params.type && { type: params.type }),
-        ...(params.name && { name: params.name }),
-      });
-      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      try {
+        const result = await client.fetchObservations({
+          page: params.page,
+          limit: params.limit,
+          ...(params.traceId && { traceId: params.traceId }),
+          ...(params.type && { type: params.type }),
+          ...(params.name && { name: params.name }),
+        });
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { isError: true, content: [{ type: "text", text: `Langfuse error: ${message}` }] };
+      }
     }
   );
 
@@ -36,8 +41,13 @@ export function registerObservationTools(
       observationId: z.string().min(1).describe("Observation ID"),
     },
     async (params) => {
-      const result = await client.fetchObservation(params.observationId);
-      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      try {
+        const result = await client.fetchObservation(params.observationId);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { isError: true, content: [{ type: "text", text: `Langfuse error: ${message}` }] };
+      }
     }
   );
 }

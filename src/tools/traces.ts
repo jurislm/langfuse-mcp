@@ -20,16 +20,21 @@ export function registerTraceTools(
       toTimestamp: z.string().datetime({ offset: true }).optional().describe("To timestamp (ISO 8601)"),
     },
     async (params) => {
-      const result = await client.fetchTraces({
-        page: params.page,
-        limit: params.limit,
-        ...(params.name && { name: params.name }),
-        ...(params.userId && { userId: params.userId }),
-        ...(params.tags && { tags: params.tags }),
-        ...(params.fromTimestamp && { fromTimestamp: new Date(params.fromTimestamp) }),
-        ...(params.toTimestamp && { toTimestamp: new Date(params.toTimestamp) }),
-      });
-      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      try {
+        const result = await client.fetchTraces({
+          page: params.page,
+          limit: params.limit,
+          ...(params.name && { name: params.name }),
+          ...(params.userId && { userId: params.userId }),
+          ...(params.tags && { tags: params.tags }),
+          ...(params.fromTimestamp && { fromTimestamp: new Date(params.fromTimestamp) }),
+          ...(params.toTimestamp && { toTimestamp: new Date(params.toTimestamp) }),
+        });
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { isError: true, content: [{ type: "text", text: `Langfuse error: ${message}` }] };
+      }
     }
   );
 
@@ -40,8 +45,13 @@ export function registerTraceTools(
       traceId: z.string().min(1).describe("Trace ID"),
     },
     async (params) => {
-      const result = await client.fetchTrace(params.traceId);
-      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      try {
+        const result = await client.fetchTrace(params.traceId);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { isError: true, content: [{ type: "text", text: `Langfuse error: ${message}` }] };
+      }
     }
   );
 }

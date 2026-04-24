@@ -2,7 +2,7 @@ import { describe, it, expect, mock, beforeEach } from "bun:test";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerTraceTools } from "./traces.js";
 
-type ToolHandler = (params: Record<string, unknown>) => Promise<{ content: { type: string; text: string }[] }>;
+type ToolHandler = (params: Record<string, unknown>) => Promise<{ isError?: boolean; content: { type: string; text: string }[] }>;
 
 function makeMockServer() {
   const handlers: Record<string, ToolHandler> = {};
@@ -57,7 +57,7 @@ describe("registerTraceTools", () => {
       });
 
       expect(mockFetchTraces).toHaveBeenCalledTimes(1);
-      const callArgs = (mockFetchTraces.mock.calls as unknown as Array<[Record<string, unknown>]>)[0][0];
+      const callArgs = (mockFetchTraces.mock.calls as unknown as Array<unknown[]>)[0][0] as Record<string, unknown>;
       expect(callArgs).toMatchObject({
         page: 2,
         limit: 10,
@@ -79,6 +79,21 @@ describe("registerTraceTools", () => {
       expect(result.content[0].type).toBe("text");
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.data[0].id).toBe("trace-1");
+    });
+  });
+
+  describe("error handling", () => {
+    it("should return isError response when SDK throws", async () => {
+      const errorClient = {
+        fetchTraces: mock(async () => { throw new Error("Network failure"); }),
+        fetchTrace: mock(async () => { throw new Error("Not found"); }),
+      };
+      const { server, handlers } = makeMockServer();
+      registerTraceTools(server, errorClient as never);
+
+      const result = await handlers["listTraces"]({ page: 1, limit: 20 });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("Network failure");
     });
   });
 
