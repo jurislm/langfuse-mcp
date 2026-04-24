@@ -192,6 +192,7 @@ describe("langfuseApi", () => {
       try {
         await langfuseApi("/test", {
           fetcher: mockFetcher,
+          retryDelays: [],
         });
         expect.unreachable();
       } catch (err) {
@@ -211,12 +212,35 @@ describe("langfuseApi", () => {
       try {
         await langfuseApi("/test", {
           fetcher: mockFetcher,
+          retryDelays: [],
         });
         expect.unreachable();
       } catch (err) {
         const error = err as Error;
         expect(error.message).toContain("Network error");
       }
+    });
+
+    it("should retry on 429 and eventually succeed", async () => {
+      let calls = 0;
+      const mockFetcher = async (): Promise<Response> => {
+        calls++;
+        if (calls < 3) {
+          return new Response("Too Many Requests", { status: 429 });
+        }
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      };
+
+      const result = await langfuseApi("/test", {
+        fetcher: mockFetcher,
+        retryDelays: [1, 1],
+      });
+
+      expect(result).toEqual({ ok: true });
+      expect(calls).toBe(3);
     });
   });
 });
