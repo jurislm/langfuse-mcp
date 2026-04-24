@@ -1,14 +1,12 @@
-/**
- * Session Query Tools
- *
- * 會話查詢（JurisLM 擴充）
- */
-
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { langfuseApi } from "../lib/api.js";
+import { getLangfuseClient } from "../lib/client.js";
+import type { Langfuse } from "langfuse";
 
-export function registerSessionTools(server: McpServer): void {
+export function registerSessionTools(
+  server: McpServer,
+  client: Pick<Langfuse, "fetchSessions"> = getLangfuseClient()
+): void {
   server.tool(
     "listSessions",
     "List sessions with pagination. Sessions group related traces together.",
@@ -19,13 +17,11 @@ export function registerSessionTools(server: McpServer): void {
       toTimestamp: z.string().datetime({ offset: true }).optional().describe("To timestamp (ISO 8601)"),
     },
     async (params) => {
-      const result = await langfuseApi("/sessions", {
-        params: {
-          page: String(params.page),
-          limit: String(params.limit),
-          ...(params.fromTimestamp && { fromTimestamp: params.fromTimestamp }),
-          ...(params.toTimestamp && { toTimestamp: params.toTimestamp }),
-        },
+      const result = await client.fetchSessions({
+        page: params.page,
+        limit: params.limit,
+        ...(params.fromTimestamp && { fromTimestamp: params.fromTimestamp }),
+        ...(params.toTimestamp && { toTimestamp: params.toTimestamp }),
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
