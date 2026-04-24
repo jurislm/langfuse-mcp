@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/jurislm/langfuse-mcp/compare/v1.1.2...v1.2.0) (2026-04-24)
+
+
+### Features
+
+* integrate Langfuse JS SDK — typed client, LangfuseApiError, withRetry, DI for traces/observations/sessions ([#8](https://github.com/jurislm/langfuse-mcp/issues/8)) ([1757ead](https://github.com/jurislm/langfuse-mcp/commit/1757ead602b469cd7f27e389fd105de48ad8645a))
+
+
+### Bug Fixes
+
+* **api:** integrate withRetry into langfuseApi and fix lastError type safety ([#10](https://github.com/jurislm/langfuse-mcp/issues/10)) ([110fae8](https://github.com/jurislm/langfuse-mcp/commit/110fae8a3b724c3aa5e04bf0be0d311c52e41979))
+
 ## [1.1.2](https://github.com/jurislm/langfuse-mcp/compare/v1.1.1...v1.1.2) (2026-04-12)
 
 
