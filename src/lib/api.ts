@@ -15,13 +15,13 @@ export async function withRetry<T>(
   opts: { retryDelays: number[] }
 ): Promise<T> {
   const delays = [...opts.retryDelays];
-  let lastError: unknown;
+  let lastError: Error = new LangfuseApiError(429, "Too Many Requests");
   for (let attempt = 0; attempt <= delays.length; attempt++) {
     try {
       return await fn();
     } catch (err) {
-      lastError = err;
-      if (!(err instanceof LangfuseApiError) || err.status !== 429) throw err;
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (!(err instanceof LangfuseApiError) || err.status !== 429) throw lastError;
       if (attempt < delays.length) {
         await new Promise((r) => setTimeout(r, delays[attempt]));
       }
@@ -79,6 +79,8 @@ function getAuthHeader(authType: AuthType = "basic"): string {
   }
 }
 
+const DEFAULT_RETRY_DELAYS = [1_000, 2_000, 4_000];
+
 /** Helper: call Langfuse REST API */
 export async function langfuseApi(
   path: string,
@@ -90,12 +92,14 @@ export async function langfuseApi(
     rawPath?: boolean;
     timeout?: number;
     fetcher?: Fetcher;
+    retryDelays?: number[];
   }
 ): Promise<unknown> {
   const authType = opts?.authType ?? "basic";
   const rawPath = opts?.rawPath ?? false;
   const timeout = opts?.timeout ?? DEFAULT_TIMEOUT_MS;
   const fetcher = opts?.fetcher ?? fetch;
+  const retryDelays = opts?.retryDelays ?? DEFAULT_RETRY_DELAYS;
   const pathPrefix = rawPath ? "" : "/api/public";
   const url = new URL(`${pathPrefix}${path}`, baseUrl);
 
@@ -111,48 +115,50 @@ export async function langfuseApi(
     }
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  return withRetry(async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  try {
-    const res = await fetcher(url.toString(), {
-      method: opts?.method ?? "GET",
-      headers: {
-        Authorization: getAuthHeader(authType),
-        "Content-Type": "application/json",
-      },
-      body: opts?.body ? JSON.stringify(opts.body) : undefined,
-      signal: controller.signal,
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new LangfuseApiError(res.status, text);
-    }
-
-    // Handle 204 No Content
-    if (res.status === 204) {
-      return null;
-    }
-
-    // Validate Content-Type before parsing JSON
-    const contentType = res.headers.get("Content-Type");
-    if (!contentType || !contentType.includes("application/json")) {
-      const text = await res.text();
-      throw new Error(
-        `Langfuse API returned unexpected Content-Type: ${contentType ?? "missing"}. Response: ${text}`
-      );
-    }
-
-    return res.json();
-  } catch (err) {
-    if (err instanceof Error && err.name === "AbortError") {
-      throw new Error(`Langfuse API request timed out after ${timeout}ms`, {
-        cause: err,
+    try {
+      const res = await fetcher(url.toString(), {
+        method: opts?.method ?? "GET",
+        headers: {
+          Authorization: getAuthHeader(authType),
+          "Content-Type": "application/json",
+        },
+        body: opts?.body ? JSON.stringify(opts.body) : undefined,
+        signal: controller.signal,
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new LangfuseApiError(res.status, text);
+      }
+
+      // Handle 204 No Content
+      if (res.status === 204) {
+        return null;
+      }
+
+      // Validate Content-Type before parsing JSON
+      const contentType = res.headers.get("Content-Type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(
+          `Langfuse API returned unexpected Content-Type: ${contentType ?? "missing"}. Response: ${text}`
+        );
+      }
+
+      return res.json();
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        throw new Error(`Langfuse API request timed out after ${timeout}ms`, {
+          cause: err,
+        });
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
     }
-    throw err;
-  } finally {
-    clearTimeout(timeoutId);
-  }
+  }, { retryDelays });
 }
