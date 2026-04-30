@@ -88,7 +88,7 @@ src/
 | `LANGFUSE_SECRET_KEY` | ✓ | 公開 API 密鑰 | `sk-lf-xxxxx` |
 | `LANGFUSE_ADMIN_API_KEY` | ✓* | Admin API Bearer Token | `adm-lf-xxxxx` |
 | `LANGFUSE_ORG_API_KEY` | ✗ | 組織 API Bearer Token（可選） | `org-lf-xxxxx` |
-| `LANGFUSE_HOST` | ✗ | API 伺服器地址（預設 cloud.langfuse.com） | `https://cloud.langfuse.com` |
+| `LANGFUSE_HOST` | ✗ | API 伺服器地址（預設 cloud.langfuse.com）；**JurisLM 用 `https://us.cloud.langfuse.com`** | `https://us.cloud.langfuse.com` |
 
 \* 若使用 Instance/Organization 管理工具則必需
 
