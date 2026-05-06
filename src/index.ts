@@ -8,9 +8,25 @@
  * 1. Prompt Management（複製官方 MCP 的 6 個 tools）
  * 2. Trace/Observation 查詢（官方 MCP 尚不支援，JurisLM 自行擴充）
  *
- * 環境變數：
+ * 環境變數（優先順序：.env.langfuse > Plugin ${VAR} > ~/.zshenv）：
  *   LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_HOST
  */
+
+// Load per-project credentials from .env.langfuse (gitignored, no new deps)
+import { existsSync, readFileSync } from "fs";
+import { join } from "path";
+const _envFile = join(process.cwd(), ".env.langfuse");
+if (existsSync(_envFile)) {
+  for (const line of readFileSync(_envFile, "utf-8").split("\n")) {
+    const t = line.trim();
+    if (!t || t.startsWith("#")) continue;
+    const eq = t.indexOf("=");
+    if (eq === -1) continue;
+    const key = t.slice(0, eq).trim();
+    const val = t.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    process.env[key] = val;
+  }
+}
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
