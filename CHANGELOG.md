@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/jurislm/langfuse-mcp/compare/v1.2.0...v1.3.0) (2026-05-06)
+
+
+### Features
+
+* **env:** per-project .env.langfuse credential override ([#17](https://github.com/jurislm/langfuse-mcp/issues/17)) ([458efe9](https://github.com/jurislm/langfuse-mcp/commit/458efe9873847380112ab3bb419243f2b7962bd3))
+
+
+### Documentation
+
+* note JurisLM-specific LANGFUSE_HOST (us.cloud.langfuse.com) ([917a1cf](https://github.com/jurislm/langfuse-mcp/commit/917a1cff4440868a3763f332a730d71ab3318390))
+
 ## [1.2.0](https://github.com/jurislm/langfuse-mcp/compare/v1.1.2...v1.2.0) (2026-04-24)
 
 
