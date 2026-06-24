@@ -1,4 +1,5 @@
 import { Langfuse } from "langfuse";
+import { getBaseUrl } from "./api.js";
 
 let _client: Langfuse | null = null;
 
@@ -12,7 +13,7 @@ export function getLangfuseClient(): Langfuse {
     _client = new Langfuse({
       publicKey,
       secretKey,
-      baseUrl: process.env.LANGFUSE_HOST ?? "https://cloud.langfuse.com",
+      baseUrl: getBaseUrl(),
       requestTimeout: 30_000,
       flushAt: 1,
       flushInterval: 0,

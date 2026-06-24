@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "bun:test";
-import { langfuseApi, LangfuseApiError, withRetry } from "./api.js";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import { getBaseUrl, langfuseApi, LangfuseApiError, withRetry } from "./api.js";
 
 describe("langfuseApi", () => {
   beforeEach(() => {
@@ -31,6 +31,44 @@ describe("langfuseApi", () => {
         const error = err as Error;
         expect(error.message).toContain("LANGFUSE_SECRET_KEY");
       }
+    });
+  });
+
+  describe("host resolution", () => {
+    const originalHost = process.env.LANGFUSE_HOST;
+
+    afterEach(() => {
+      if (originalHost !== undefined) {
+        process.env.LANGFUSE_HOST = originalHost;
+      } else {
+        delete process.env.LANGFUSE_HOST;
+      }
+    });
+
+    it("getBaseUrl returns the default host when LANGFUSE_HOST is unset", () => {
+      delete process.env.LANGFUSE_HOST;
+      expect(getBaseUrl()).toBe("https://cloud.langfuse.com");
+    });
+
+    it("getBaseUrl reflects LANGFUSE_HOST set after module load", () => {
+      process.env.LANGFUSE_HOST = "https://us.cloud.langfuse.com";
+      expect(getBaseUrl()).toBe("https://us.cloud.langfuse.com");
+    });
+
+    it("langfuseApi targets the host resolved at request time", async () => {
+      process.env.LANGFUSE_HOST = "https://eu.example-langfuse.com";
+      let capturedUrl = "";
+      const mockFetcher = async (url: string): Promise<Response> => {
+        capturedUrl = url;
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      };
+
+      await langfuseApi("/test", { fetcher: mockFetcher });
+
+      expect(capturedUrl.startsWith("https://eu.example-langfuse.com/")).toBe(true);
     });
   });
 
