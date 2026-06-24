@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/jurislm/langfuse-mcp/compare/v1.3.0...v1.3.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* **api:** resolve LANGFUSE_HOST lazily so .env.langfuse host is honored ([#20](https://github.com/jurislm/langfuse-mcp/issues/20)) ([a641c3f](https://github.com/jurislm/langfuse-mcp/commit/a641c3fb3ce0823750418f7a912eb63dbfa72e4e))
+
 ## [1.3.0](https://github.com/jurislm/langfuse-mcp/compare/v1.2.0...v1.3.0) (2026-05-06)
 
 
