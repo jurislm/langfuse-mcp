@@ -58,7 +58,17 @@ export function getOrgAuthHeader(): string {
   return `Bearer ${orgKey}`;
 }
 
-export const baseUrl = process.env.LANGFUSE_HOST ?? "https://cloud.langfuse.com";
+/**
+ * Resolve the Langfuse host at call time.
+ *
+ * Must stay lazy: `index.ts` populates `process.env` from `.env.langfuse`
+ * inside its module body, which runs *after* this module is evaluated (ESM
+ * imports are hoisted). A module-level constant would capture the host before
+ * `.env.langfuse` is loaded and silently ignore its `LANGFUSE_HOST`.
+ */
+export function getBaseUrl(): string {
+  return process.env.LANGFUSE_HOST ?? "https://cloud.langfuse.com";
+}
 
 type AuthType = "basic" | "admin-bearer" | "org-bearer";
 
@@ -101,7 +111,7 @@ export async function langfuseApi(
   const fetcher = opts?.fetcher ?? fetch;
   const retryDelays = opts?.retryDelays ?? DEFAULT_RETRY_DELAYS;
   const pathPrefix = rawPath ? "" : "/api/public";
-  const url = new URL(`${pathPrefix}${path}`, baseUrl);
+  const url = new URL(`${pathPrefix}${path}`, getBaseUrl());
 
   if (opts?.params) {
     for (const [k, v] of Object.entries(opts.params)) {
