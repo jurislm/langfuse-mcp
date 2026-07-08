@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/jurislm/langfuse-mcp/compare/v1.3.1...v1.3.2) (2026-07-08)
+
+
+### Bug Fixes
+
+* **build:** 改用 node runtime 發布，移除對 bun 的執行期依賴 ([#23](https://github.com/jurislm/langfuse-mcp/issues/23)) ([04415b7](https://github.com/jurislm/langfuse-mcp/commit/04415b789249ce94bf8aecc0b125d2dd680a14c7))
+
 ## [1.3.1](https://github.com/jurislm/langfuse-mcp/compare/v1.3.0...v1.3.1) (2026-06-24)
 
 
