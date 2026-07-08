@@ -12,12 +12,12 @@
   ],
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
-    "start": "bun dist/index.js",
+    "build": "bun build src/index.ts --outdir dist --target node",
+    "start": "node dist/index.js",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --max-warnings=0",
-    "prepublishOnly": "bun run build && bun run lint"
+    "prepublishOnly": "bun run build && bun run lint && node scripts/check-dist-runtime.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "packageManager": "bun@1.3.9",
   "engines": {
-    "bun": ">=1.1.0"
+    "node": ">=18"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

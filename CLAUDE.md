@@ -169,8 +169,8 @@ bun run dev
 {
   "mcpServers": {
     "langfuse": {
-      "command": "bunx",
-      "args": ["github:jurislm/langfuse-mcp"],
+      "command": "npx",
+      "args": ["-y", "@jurislm/langfuse-mcp@latest"],
       "env": {
         "LANGFUSE_PUBLIC_KEY": "...",
         "LANGFUSE_SECRET_KEY": "...",
