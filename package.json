@@ -17,7 +17,7 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --max-warnings=0",
-    "prepublishOnly": "bun run build && bun run lint"
+    "prepublishOnly": "bun run build && bun run lint && node scripts/check-dist-runtime.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

@@ -108,8 +108,8 @@ Add to your MCP configuration (`.mcp.json` or `~/.claude/settings.json`):
 {
   "mcpServers": {
     "langfuse": {
-      "command": "bunx",
-      "args": ["@jurislm/langfuse-mcp@latest"],
+      "command": "npx",
+      "args": ["-y", "@jurislm/langfuse-mcp@latest"],
       "env": {
         "LANGFUSE_PUBLIC_KEY": "pk-lf-...",
         "LANGFUSE_SECRET_KEY": "sk-lf-...",
