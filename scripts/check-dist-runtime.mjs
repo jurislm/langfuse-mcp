@@ -23,7 +23,8 @@ try {
   fail("dist/index.js not found — run `bun run build` first");
 }
 
-const shebang = source.split("\n", 1)[0];
+// 用 /\r?\n/ 而非 "\n"：CRLF 環境下後者會留下尾端 \r，造成誤判失敗
+const shebang = source.split(/\r?\n/, 1)[0];
 if (shebang !== "#!/usr/bin/env node") {
   fail(`dist/index.js shebang is ${JSON.stringify(shebang)}, expected "#!/usr/bin/env node"`);
 }

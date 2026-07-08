@@ -12,6 +12,7 @@ describe("entrypoint must target plain node", () => {
   const entry = fileURLToPath(new URL("./index.ts", import.meta.url));
 
   it("uses a node shebang", () => {
-    expect(readFileSync(entry, "utf8").split("\n")[0]).toBe("#!/usr/bin/env node");
+    // 用 /\r?\n/ 而非 "\n"：CRLF 環境下後者會留下尾端 \r
+    expect(readFileSync(entry, "utf8").split(/\r?\n/)[0]).toBe("#!/usr/bin/env node");
   });
 });

@@ -120,7 +120,8 @@ Add to your MCP configuration (`.mcp.json` or `~/.claude/settings.json`):
 }
 ```
 
-> **Note:** Requires [Bun](https://bun.sh) installed globally (`curl -fsSL https://bun.sh/install | bash`).
+> **Note:** Runtime requires only **Node.js >= 18** — the published binary runs under plain `node`, so `npx` works without any extra tooling.
+> [Bun](https://bun.sh) is needed **only for local development** (see [Development](#development)), never to run this server.
 
 ### Usage with Claude Code Plugin (jurislm-tools)
 
