@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = new URL('../../', import.meta.url)
@@ -40,9 +41,9 @@ describe('release-please exclude-paths', () => {
 
   it('lists only canonical existing subdirectories, because release-please matches exclude-paths by literal directory prefix', () => {
     const invalid = excludePaths.filter((path) => {
-      const noncanonical = path.split('/').some((segment) => segment === '' || segment === '.' || segment === '..')
-      const url = new URL(path, root)
-      return noncanonical || !existsSync(url) || !statSync(url).isDirectory()
+      const canonical = path.split('/').every((segment) => /^[\w.-]+$/.test(segment) && !/^\.\.?$/.test(segment))
+      const dir = join(fileURLToPath(root), path)
+      return !canonical || !existsSync(dir) || !statSync(dir).isDirectory()
     })
     expect(invalid).toEqual([])
   })
